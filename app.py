@@ -4,6 +4,13 @@ import numpy as np
 
 df = pd.read_csv(r"Dataset\startup_clean.csv")
 
+def load_investor_details(investor):
+    st.title(investor)
+    # load the recent 5 investment by the investors
+    last5_df = df[df['investors'].str.contains(investor)].head()[['date','startup','vertical','city','round']]
+    st.subheader('Most Recent Investment')
+    st.dataframe(last5_df)
+    
 st.sidebar.title("Startup Funding Analysis")
 
 options = st.sidebar.selectbox("Select one", ['Overall Analysis', 'Startup', 'Investor'])
@@ -17,9 +24,11 @@ elif options == "Startup":
     
 
 else:
-    st.sidebar.selectbox('Select Startup', sorted(set(df['investors'].str.split(",").sum())))
+    selected_investor = st.sidebar.selectbox('Select Startup', sorted(set(df['investors'].str.split(",").sum())))
     btn2 = st.sidebar.button("Find Investor Detail")
-    st.title("Investors")
+    if btn2 :
+        load_investor_details(selected_investor)
+
 
 
 

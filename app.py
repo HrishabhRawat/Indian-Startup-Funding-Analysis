@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 st.set_page_config(layout='wide', page_title = 'Startup Analysis')
 df = pd.read_csv(r"Dataset\startup_clean.csv")
-
+df['date'] = pd.to_datetime(df['date'], errors='coerce')
 def load_investor_details(investor):
     st.title(investor)
     # load the recent 5 investment by the investors
@@ -19,11 +19,26 @@ def load_investor_details(investor):
         big_series = df[df['investors'].str.contains(investor)].groupby('startup')['amount'].sum().sort_values(ascending= False).head()
         st.subheader("Biggest Investment")
         st.dataframe(big_series)
-    with col2 :
         fig , ax = plt.subplots()
         ax.bar(big_series.index, big_series.values)
         st.pyplot(fig)
 
+    # pie chart in which sector a particular investor invested in 
+    with col2:
+        sectors = df[df['investors'].str.contains(investor)].groupby('vertical')['amount'].sum()
+        st.subheader('Sectors Invested in ')
+        fig1 , ax1 = plt.subplots()
+        ax1.pie(sectors, labels = sectors.index, autopct="%0.01f%%")
+        st.pyplot(fig1)
+
+
+    # Year on Year investment of the particualr investor
+    st.subheader("Year on Year Investment")
+    df['year'] = df['date'].dt.year
+    year_series = df[df['investors'].str.contains(investor)].groupby('year')['amount'].sum()
+    fig2, ax2= plt.subplots()
+    ax2.plot(year_series.index, year_series.values)
+    st.pyplot(fig2)
     
 
 

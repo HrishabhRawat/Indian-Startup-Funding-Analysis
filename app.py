@@ -6,6 +6,10 @@ import matplotlib.pyplot as plt
 st.set_page_config(layout='wide', page_title = 'Startup Analysis')
 df = pd.read_csv(r"Dataset\startup_clean.csv")
 df['date'] = pd.to_datetime(df['date'], errors='coerce')
+df['month'] = df['date'].dt.month
+df['year'] = df['date'].dt.year
+
+
 def load_investor_details(investor):
     st.title(investor)
     # load the recent 5 investment by the investors
@@ -56,6 +60,16 @@ def load_overall_analysis():
         total_startup = df['startup'].nunique()
         st.metric("Funded Startup", total_startup)
 
+    st.header("Month on Month Graph")
+    selected_option = st.selectbox('Select Type', ['Total', 'Count'])
+    if selected_option == 'Total':
+        temp_df = df.groupby(['year', 'month'])['amount'].sum().reset_index()
+    else:
+        temp_df = df.groupby(['year', 'month'])['amount'].count().reset_index()
+    temp_df['x_axis'] = temp_df['month'].astype('str') + '-' + temp_df['year'].astype('str')
+    fig3 , ax3 = plt.subplots()
+    ax3.plot(temp_df['x_axis'].index, temp_df['amount'].values)
+    st.pyplot(fig3)
 
 
 
@@ -65,9 +79,9 @@ options = st.sidebar.selectbox("Select one", ['Overall Analysis', 'Startup', 'In
 
 if options == "Overall Analysis":
     st.title("Overall Analysis")
-    btn0 = st.sidebar.button("Show Overall Analysis")
-    if btn0:
-        load_overall_analysis()
+    # btn0 = st.sidebar.button("Show Overall Analysis")
+    # if btn0:
+    load_overall_analysis()
 
 elif options == "Startup":
     st.sidebar.selectbox('Select Startup', sorted(df['startup'].unique().tolist()))

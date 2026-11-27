@@ -41,7 +41,20 @@ def load_investor_details(investor):
     st.pyplot(fig2)
     
 
-
+def load_overall_analysis():
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        total = round(df['amount'].sum())
+        st.metric("Total", str(total) + ' Indian Rupees')
+    with col2:
+        max_total = round(df.groupby('startup')['amount'].max().sort_values(ascending = False).head(1).values[0])
+        st.metric('Max' , str(max_total) + ' Indian Rupees')
+    with col3:
+        avg_funding = round(df.groupby('startup')['amount'].sum().mean())
+        st.metric('Average', str(avg_funding) + " Indian Rupees")
+    with col4:
+        total_startup = df['startup'].nunique()
+        st.metric("Funded Startup", total_startup)
 
 
 
@@ -52,6 +65,10 @@ options = st.sidebar.selectbox("Select one", ['Overall Analysis', 'Startup', 'In
 
 if options == "Overall Analysis":
     st.title("Overall Analysis")
+    btn0 = st.sidebar.button("Show Overall Analysis")
+    if btn0:
+        load_overall_analysis()
+
 elif options == "Startup":
     st.sidebar.selectbox('Select Startup', sorted(df['startup'].unique().tolist()))
     btn1 = st.sidebar.button("Find Startup Detail")
